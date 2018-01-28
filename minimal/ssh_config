@@ -1,0 +1,10 @@
+#### Ansible testing
+Host ansible-test1
+  Hostname x.x.x.x             # change to your host's IP address
+  User root                    # change if using a different default user
+  IdentityFile ~/.ssh/id_rsa   # change if using a different SSH key
+
+Host ansible-test2
+  Hostname x.x.x.x             # change to your host's IP address
+  User root                    # change if using a different default user
+  IdentityFile ~/.ssh/id_rsa   # change if using a different SSH key

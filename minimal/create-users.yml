@@ -1,0 +1,43 @@
+---
+- hosts: test
+  remote_user: root
+  gather_facts: false
+  tasks:
+    - name: Create 'staff' sudo group
+      group:
+        name: staff
+        state: present
+    - name: Allow 'staff' to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        line: '%staff ALL=(ALL) NOPASSWD: ALL'
+    - name: Create non-root sudo user 'quintessence'
+      user:
+        name: quintessence   # change all instances of user 'quintessence' to your desired username
+        group: staff
+        groups: sudo
+        state: present
+        shell: /bin/bash
+        generate_ssh_key: yes
+        ssh_key_bits: 4096
+        ssh_key_file: .ssh/id_rsa
+        ssh_key_comment: quintessence on ansible
+    - name: Give user 'quintessence' an authorized key
+      authorized_key:
+        user: quintessence
+        key: |
+          ssh-rsa ...  # change to your user's public key, default can be found in ~/.ssh/id_rsa.pub
+    - name: Clone jhunt env / .rc files for user 'quintessence'
+      become: yes
+      become_user: quintessence
+      git:
+        repo: https://github.com/jhunt/env
+        dest: /home/quintessence/env
+        clone: yes
+    - name: Install jhunt env / .rc files for user 'quintessence'
+      become: yes
+      become_user: quintessence
+      command: ./install
+      args:
+        chdir: /home/quintessence/env
